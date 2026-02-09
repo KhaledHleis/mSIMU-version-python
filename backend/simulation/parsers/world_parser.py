@@ -19,9 +19,9 @@ class WorldParser:
         fill from fake, this method uses the fakeclass that is automaticaly populated using pydinamic to fill the actual class.
         """
         
-        refrence_point = np.array(
-            [fake_class.reference_longitude, fake_class.reference_latitude, 0]
-        ).reshape(1, -1)
+        reference_point = np.array(
+            [[fake_class.reference_longitude, fake_class.reference_latitude, 0]]
+        )
         
         target_array: List[Target] = []
         for cable in fake_class.cables:
@@ -35,8 +35,8 @@ class WorldParser:
             end = np.array(
                 [cable.ending_longitude, cable.ending_latitude, cable.ending_depth]
             ).reshape(1, 3)
-            start = LLD_to_Coo(start,refrence_point)
-            end = LLD_to_Coo(end,refrence_point)
+            start = LLD_to_Coo(start,reference_point)
+            end = LLD_to_Coo(end,reference_point)
             c = Cable(cable.name, start, end, cable.current)
             target_array.append(c)
         for dipole in fake_class.dipoles:
@@ -47,12 +47,12 @@ class WorldParser:
                     dipole.center_depth,
                 ]
             ).reshape(1, 3)
-            center_point = LLD_to_Coo(center_point,refrence_point)
+            center_point = LLD_to_Coo(center_point,reference_point)
             d = Dipole(dipole.name, center_point, dipole.dipole_moment)            
             target_array.append(d)
 
         world = World(fake_class.name, target_array)        
-        world.refrence_point = refrence_point
+        world.reference_point = reference_point
         world.simulation_radius = fake_class.simulation_radius
         world.regional_magnetic_field = np.array(fake_class.regional_magnetic_field)
         return world

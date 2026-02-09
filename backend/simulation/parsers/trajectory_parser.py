@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from utilities.utilities_importer import *
 
+from backend.utilities.utilities_importer import *
 
 class Trajectory_parser:
 
@@ -23,7 +23,7 @@ class Trajectory_parser:
         Returns
         -------
         tuple[float, np.ndarray, np.ndarray, np.ndarray]
-            deta_timestamp : float
+            delta_timestamp : float
                 Difference between the first two timestamps (same units as the timestamp column).
             longitude : np.ndarray
                 Longitude values from the CSV.
@@ -38,12 +38,12 @@ class Trajectory_parser:
         latitude = np.array(df_trajectory["latitude"])
         heading = np.array(df_trajectory["heading"])
 
-        deta_timestamp = timestamps[1] - timestamps[0]
+        delta_timestamp = timestamps[1] - timestamps[0]
 
-        if(ref!=None):
-            coordinates = np.array([longitude,latitude,np.zeros_like(longitude)]).reshape((-1,3))
-            coordinates = LLD_to_Coo(coordinates,ref)
-            longitude = coordinates[0]
-            latitude = coordinates[1]
+        if(ref is not None):
+            coordinates = np.array([longitude, latitude, np.zeros_like(longitude)]).T  # Transpose!
+            coordinates = LLD_to_Coo(coordinates, ref)
+            longitude = coordinates[:,0]
+            latitude = coordinates[:,1]
         
-        return deta_timestamp, longitude, latitude, heading
+        return delta_timestamp, longitude, latitude, heading

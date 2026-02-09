@@ -1,0 +1,20 @@
+# Experiments / results
+experiments/
+logs
+
+# Pickle files
+*.pickle
+*.pkl
+
+# Figures
+*.png
+*.pdf
+*.svg
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+.venv/
+venv/

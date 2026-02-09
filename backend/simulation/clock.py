@@ -1,6 +1,6 @@
 from metaclasses.singleton import Singleton
-
-class CLock(metaclass=Singleton):
+from metaclasses.string_convertable import StringConvertible
+class CLock(StringConvertible,metaclass=Singleton):
     """
     Singleton clock class.
 

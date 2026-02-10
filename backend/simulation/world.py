@@ -13,7 +13,7 @@ class World(SIMU,IWorld):
     
     
     def calculate_entire_field_at_position(self,position:np.ndarray)->np.ndarray:
-        B = np.zeros((1,3))
+        B = self.regional_magnetic_field.copy().reshape(1,3)
         for target in self.target_array:
             B += target.calculate_field_at_position(position)
         return B

@@ -10,7 +10,7 @@ def LLD_to_Coo(input: np.ndarray, ref: np.ndarray) -> np.ndarray:
     - ref: np.ndarray, shape (1, 3), reference point [longitude, latitude, depth]
     
     Returns:
-    - np.ndarray of shape (N, 3), local coordinates in meters [x_east, y_north, z_down]
+    - np.ndarray of shape (N, 3), local coordinates in meters in NED frame [x_north, y_east, z_down]
     """
 
     # Validate input
@@ -28,19 +28,19 @@ def LLD_to_Coo(input: np.ndarray, ref: np.ndarray) -> np.ndarray:
     )
 
     # Transform all points
-    x_local = []
-    y_local = []
+    x_enu = []  # East
+    y_enu = []  # North
     for lon, lat, depth in input:
         x, y = transformer.transform(lon, lat)
-        x_local.append(x)
-        y_local.append(y)
-    x_local = np.array(x_local)
-    y_local = np.array(y_local)
+        x_enu.append(x)
+        y_enu.append(y)
+    x_enu = np.array(x_enu)
+    y_enu = np.array(y_enu)
 
-    # Depth as z in local coordinates (positive down)
-    z_local = input[:, 2] - depth0
+    # Depth as z (positive down in both frames)
+    z_down = input[:, 2] - depth0
 
-    # Stack as (N, 3)
-    local_coords = np.stack([x_local, y_local, z_local], axis=1)
+    # Convert ENU to NED: NED = [N, E, D] = [y_enu, x_enu, z_down]
+    local_coords = np.stack([y_enu, x_enu, z_down], axis=1)
 
     return local_coords

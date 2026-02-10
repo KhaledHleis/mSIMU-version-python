@@ -19,8 +19,7 @@ class Target(SIMU,ITarget):
             np.ndarray: magnetic field vector or shape (1,3)
         """
         pass
-    
-    
+
 import numpy as np
 
 from backend.simulation.target import Target
@@ -76,12 +75,16 @@ class Cable(Target):
         r2 = np.linalg.norm(R2)
 
         cross_R1_R2 = np.cross(R1, R2)
-        cross_norm_sq = np.dot(cross_R1_R2, cross_R1_R2)
+        cross_norm_sq = cross_R1_R2 @ cross_R1_R2.T
 
         if cross_norm_sq == 0.0:
             raise ValueError("Field is undefined on the cable axis")
 
-        term = (np.dot(R1, L) / r1) - (np.dot(R2, L) / r2)
+        term = (R1@L.T / r1) - (R2@L.T / r2)
 
-        field = self.current * cross_R1_R2 / cross_norm_sq * term
+        # μ₀/(4π) = 10^-7 T·m/A = 100 nT·m/A
+        # Use 100 if you want output in nanoTesla
+        mu_0_over_4pi = 100  # nT·m/A
+        
+        field = mu_0_over_4pi * self.current * cross_R1_R2 / cross_norm_sq * term
         return field

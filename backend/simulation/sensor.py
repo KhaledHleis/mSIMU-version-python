@@ -5,7 +5,7 @@ from abc import abstractmethod
 #? abstract classes
 from backend.metaclasses.simu_class import SIMU
 #? utilities
-from backend.utilities.utilities_converter import Absolute_position
+from backend.utilities.utilities_converter import Absolute_position,convert_field_ned_to_body
 #? interfaces
 from backend.simulation.Interfaces.sensor_interface import ISensor
 from backend.simulation.Interfaces.drone_interface import IDrone
@@ -29,8 +29,22 @@ class Fluxgate(Sensor):
 
     def make_mesurment(self):
         world = self.parent_drone.world
-        return world.calculate_entire_field_at_position(
+        
+        # Get field in NED frame at sensor position
+        field_ned = world.calculate_entire_field_at_position(
             Absolute_position(
-                self.parent_drone.current_position, self.parent_drone.current_heading,self.relative_position
+                self.parent_drone.current_position, 
+                self.parent_drone.current_heading,
+                self.relative_position
             )
         )
+        
+        # Convert from NED to body frame using drone's attitude
+        field_body = convert_field_ned_to_body(
+            field_ned,
+            0,
+            0,
+            self.parent_drone.current_heading  # yaw
+        )
+        
+        return field_body

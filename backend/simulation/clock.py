@@ -1,5 +1,5 @@
-from metaclasses.singleton import Singleton
-from metaclasses.string_convertable import StringConvertible
+from backend.metaclasses.singleton import Singleton
+from backend.metaclasses.string_convertable import StringConvertible
 
 
 class Clock(StringConvertible, metaclass=Singleton):

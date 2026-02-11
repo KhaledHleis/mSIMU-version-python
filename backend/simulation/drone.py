@@ -24,6 +24,10 @@ class Drone(SIMU, IDrone):
             c = sensor.make_measurement()
         return c
 
+    def update_position(self,long,lat,heading,depth = None):
+        self.current_heading = heading
+        self.current_position(np.array([long,lat,self.current_position[0,2] if depth is None else depth]))
+    
     def __init__(self, name):
         super().__init__(name)
         self.clock = Clock()

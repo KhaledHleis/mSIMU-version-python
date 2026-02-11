@@ -3,7 +3,7 @@ import numpy as np
 
 from backend.utilities.utilities_importer import *
 
-class Trajectory_parser:
+class TrajectoryParser:
 
     @classmethod
     def read_pbp(cls, filename,ref:np.ndarray=None) -> tuple[float, np.ndarray, np.ndarray, np.ndarray]:
@@ -36,7 +36,7 @@ class Trajectory_parser:
         timestamps = np.array(df_trajectory["timestamp"])
         longitude = np.array(df_trajectory["longitude"])
         latitude = np.array(df_trajectory["latitude"])
-        heading = np.array(df_trajectory["heading"])
+        heading = np.radians(np.array(df_trajectory["heading"]))
 
         delta_timestamp = timestamps[1] - timestamps[0]
 

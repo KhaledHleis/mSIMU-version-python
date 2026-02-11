@@ -1,4 +1,5 @@
 import json
+import numpy as np
 from typing import Any
 
 class StringConvertible:
@@ -20,11 +21,17 @@ class StringConvertible:
     def to_dict(self) -> dict:
         """
         Recursively converts the object to a dictionary,
-        handling nested objects and arrays.
+        handling nested objects, arrays, and numpy arrays.
         """
         def convert_value(value: Any) -> Any:
+            # If it's a numpy array, convert to list
+            if isinstance(value, np.ndarray):
+                return value.tolist()
+            # If it's a numpy scalar type
+            elif isinstance(value, (np.integer, np.floating)):
+                return value.item()
             # If it's a StringConvertible instance, recursively convert
-            if isinstance(value, StringConvertible):
+            elif isinstance(value, StringConvertible):
                 return value.to_dict()
             # If it's a list, convert each element
             elif isinstance(value, list):

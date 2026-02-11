@@ -16,7 +16,7 @@ class Sensor(SIMU,ISensor):
     relative_position: np.ndarray
 
     @abstractmethod
-    def make_mesurment(self):
+    def make_measurement(self):
         pass
 
     def __init__(self, name, parent_drone: IDrone, relative_position: np.ndarray):
@@ -27,7 +27,7 @@ class Sensor(SIMU,ISensor):
 
 class Fluxgate(Sensor):
 
-    def make_mesurment(self):
+    def make_measurement(self):
         world = self.parent_drone.world
         
         # Get field in NED frame at sensor position

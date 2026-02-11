@@ -1,15 +1,18 @@
 from metaclasses.singleton import Singleton
 from metaclasses.string_convertable import StringConvertible
-class CLock(StringConvertible,metaclass=Singleton):
+
+
+class Clock(StringConvertible, metaclass=Singleton):
     """
     Singleton clock class.
 
     Keeps a global timestamp and applies a conversion factor
     when incrementing time.
-    
-    timestamp is an integer in [ms] milliseconds, 
+
+    timestamp is an integer in [ms] milliseconds,
     and the conversion_factor that multiplies the increment value for example it could be the sampling rate x1000.
     """
+
     def __init__(self):
         self.__time_stamp: int = 0
         self.conversion_factor: int = 1

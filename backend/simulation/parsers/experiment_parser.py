@@ -10,31 +10,35 @@ class ExperimentParser:
     @classmethod
     def __fff(cls, fake_experiment: BaseModel) -> Experiment:
         """
-        Fill from fake, this method uses the fake class that is automatically 
+        Fill from fake, this method uses the fake class that is automatically
         populated using pydantic to fill the actual class.
         """
         # Create the experiment instance
-        experiment = Experiment(fake_experiment.world_name)
-        
+        experiment = Experiment(fake_experiment.experiment_name)
+
         # Set basic parameters
         experiment.world_name = fake_experiment.world_name
         experiment.drone_name = fake_experiment.drone_name
         experiment.trajectory_type = fake_experiment.trajectory_type
-        
+        experiment.skip_logging = fake_experiment.skip_logging
         # Set trajectory-specific parameters based on type
         if fake_experiment.trajectory_type == "pp":
             if fake_experiment.pp_trajectory_filename:
-                experiment.pp_trajectory_filename = fake_experiment.pp_trajectory_filename
+                experiment.pp_trajectory_filename = (
+                    fake_experiment.pp_trajectory_filename
+                )
             else:
-                raise ValueError("trajectory_type 'pp' requires pp_trajectory_filename parameter")
-        
+                raise ValueError(
+                    "trajectory_type 'pp' requires pp_trajectory_filename parameter"
+                )
+
         # Add more trajectory types here as needed
         # elif fake_experiment.trajectory_type == "circle":
         #     experiment.circle_radius = fake_experiment.circle_radius
         #     experiment.circle_center = fake_experiment.circle_center
         # elif fake_experiment.trajectory_type == "waypoint":
         #     experiment.waypoint_list = fake_experiment.waypoint_list
-        
+
         return experiment
 
     @classmethod
@@ -86,13 +90,14 @@ class ExperimentParser:
 
 #! These are template classes used to easily populate the classes from the json files
 class FakeExperiment(BaseModel):
+    experiment_name: str
     world_name: str
     drone_name: str
     trajectory_type: str
-    
+    skip_logging:bool
     # Optional parameters for different trajectory types
     pp_trajectory_filename: Optional[str] = None
-    
+
     # Placeholder for future trajectory types
     # circle_radius: Optional[float] = None
     # circle_center: Optional[List[float]] = None

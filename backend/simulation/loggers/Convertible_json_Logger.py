@@ -91,7 +91,7 @@ class BatchLoggerThread(LoggerThread):
     Useful for high-frequency logging scenarios.
     """
     
-    def __init__(self, log_dir: str = "logs", batch_size: int = 10, flush_interval: float = 5.0):
+    def __init__(self, log_dir: str = "logs", batch_size: int = 10, flush_interval: float = 1):
         """
         Args:
             log_dir: Directory where log files will be saved
@@ -113,7 +113,7 @@ class BatchLoggerThread(LoggerThread):
                 
                 # Try to get an item
                 try:
-                    obj, filename = self.queue.get(timeout=0.5)
+                    obj, filename = self.queue.get(timeout=0.5)                    
                     self.batch.append(obj.to_dict())
                     self.queue.task_done()
                     
@@ -125,6 +125,7 @@ class BatchLoggerThread(LoggerThread):
                     continue
                     
             except Exception as e:
+                print("logger >>>>>",obj)
                 print(f"[BatchLogger] Worker error: {e}")
         
         # Flush remaining items on shutdown

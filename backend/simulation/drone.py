@@ -8,7 +8,6 @@ from backend.simulation.Interfaces.drone_interface import IDrone
 from backend.simulation.Interfaces.world_interface import IWorld
 from backend.simulation.clock import Clock
 
-from backend.utilities.utilities_logger import Log_drone
 
 class Drone(SIMU, IDrone):
     name: str
@@ -16,18 +15,23 @@ class Drone(SIMU, IDrone):
     sensor_array: List[ISensor]
     current_position: np.ndarray
     current_heading: np.ndarray
-    clock:Clock
-
+    clock: Clock
+    
     # Hack: this is a place holder function, you should change it later ...
     def get_current_data(self):
         for sensor in self.sensor_array:
-            c = sensor.make_measurement()
+            c = sensor.make_measurement(self)
         return c
 
-    def update_position(self,long,lat,heading,depth = None):
+    def update_current_data(self):
+        for sensor in self.sensor_array:
+            c = sensor.make_measurement(self)
+    def update_position(self, long, lat, heading, depth=None):
         self.current_heading = heading
-        self.current_position(np.array([long,lat,self.current_position[0,2] if depth is None else depth]))
-    
+        self.current_position = np.array(
+            [[long, lat, self.current_position[0, 2] if depth is None else depth]]
+        )
+
     def __init__(self, name):
         super().__init__(name)
         self.clock = Clock()

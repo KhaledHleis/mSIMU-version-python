@@ -10,6 +10,9 @@ class IDrone():
     current_position: np.ndarray
     current_heading: np.ndarray
     clock:Clock
+    
+    def update_current_data(self):
+        pass
     def update_position(self,long,lat,heading,depth = None):
         pass
     def __init__(self):

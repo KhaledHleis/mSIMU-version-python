@@ -1,6 +1,8 @@
 from typing import Tuple, Optional
 import numpy as np
 
+from backend.metaclasses.simu_class import SIMU
+
 from backend.simulation.Interfaces.drone_interface import IDrone
 from backend.simulation.Interfaces.world_interface import IWorld
 from backend.simulation.clock import Clock
@@ -11,12 +13,16 @@ from backend.simulation.parsers.drone_parser import DroneParser
 
 from backend.utilities.utilities_logger import initialize_loggers_batch_with_timestamp
 
+import time
 
-class experiment:
+
+class Experiment(SIMU):
     world_name: str
     drone_name: str
     trajectory_type: str
-
+    world: IWorld
+    drone: IDrone
+    skip_logging:bool
     # Optional parameters for different trajectory types
     pp_trajectory_filename: Optional[str] = None
 
@@ -25,22 +31,22 @@ class experiment:
     ) -> Tuple[int, np.ndarray, np.ndarray, np.ndarray, IWorld, IDrone]:
         #! setup world & drone
         world = WorldParser.Parse(world_file)
-        drone = DroneParser.Parse(drone_file)
+        drone = DroneParser.Parse(drone_file, world)
         #! get trajectory
         delta_timestamp, longitude, latitude, heading = TrajectoryParser.read_pbp(
             trajectory_file, ref=world.reference_point
         )
         return delta_timestamp, longitude, latitude, heading, world, drone
 
-    def run(self, experiment_name):
-        if self.trajectory_type is "pp":
+    def run(self):
+        if self.trajectory_type in "pp":
             (
                 delta_timestamp,
                 longitude_array,
                 latitude_array,
                 heading_array,
-                world,
-                drone,
+                self.world,
+                self.drone,
             ) = self.experiment_from_manip(
                 world_file=self.world_name,
                 trajectory_file=self.pp_trajectory_filename,
@@ -50,19 +56,24 @@ class experiment:
         clock = Clock()
         clock.set_conversion_factor(delta_timestamp)
         #! set drone in place
-        drone.update_position(longitude, latitude, heading, depth=0)
-        #! initiate loggers
-        drone_logger, world_logger, experiment_name = (
-            initialize_loggers_batch_with_timestamp(experiment_name)
+        self.drone.update_position(
+            longitude_array[0], latitude_array[0], heading_array[0], depth=0
         )
+        #! initiate loggers
+        if(not self.skip_logging):
+            drone_logger, world_logger, self.name = initialize_loggers_batch_with_timestamp(
+                self.name, batch_size=10000,flush_frequency=0.1
+            )
         #! program loop over all trajectory points
+        if(not self.skip_logging): world_logger.log(self.world)
         for longitude, latitude, heading in zip(
             longitude_array, latitude_array, heading_array
         ):
-            drone.update_position(longitude, latitude, heading)
+            self.drone.update_position(longitude, latitude, heading)
+            self.drone.update_current_data()
             clock.increment_time()
-            world_logger.log(world)
-            drone_logger.log(drone)
+            if(not self.skip_logging):
+                drone_logger.log(self.drone)
 
-    def __init__(self):
-        pass
+    def __init__(self, name):
+        self.name = name

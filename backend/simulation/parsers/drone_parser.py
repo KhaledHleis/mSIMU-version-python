@@ -13,40 +13,36 @@ class DroneParser:
     @classmethod
     def __fff(cls, fake_drone: BaseModel, world) -> IDrone:
         """
-        Fill from fake, this method uses the fake class that is automatically 
+        Fill from fake, this method uses the fake class that is automatically
         populated using pydantic to fill the actual class.
         """
         # Create the drone instance
         drone = Drone(fake_drone.name)
         drone.world = world
-        
+
         # Initialize sensor array
         sensor_array: List[ISensor] = []
-        
+
         for fake_sensor in fake_drone.sensors:
             relative_position = np.array(fake_sensor.relative_position).reshape(1, 3)
-            
+
             # Create sensor based on type
             if fake_sensor.type == "Fluxgate":
-                sensor = Fluxgate(
-                    fake_sensor.name,
-                    drone,
-                    relative_position
-                )
+                sensor = Fluxgate(fake_sensor.name, relative_position)
             # Add more sensor types here as needed
             # elif fake_sensor.type == "OtherSensorType":
             #     sensor = OtherSensor(...)
             else:
                 raise ValueError(f"Unknown sensor type: {fake_sensor.type}")
-            
+
             sensor_array.append(sensor)
-        
+
         drone.sensor_array = sensor_array
-        
+
         # Initialize position and heading (can be set later via update_position)
         drone.current_position = np.array([[0, 0, 0]])
         drone.current_heading = 0
-        
+
         return drone
 
     @classmethod

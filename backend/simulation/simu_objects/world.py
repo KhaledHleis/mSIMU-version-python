@@ -4,7 +4,7 @@ from backend.metaclasses.simu_class import SIMU
 
 from backend.simulation.Interfaces.target_interface import ITarget
 from backend.simulation.Interfaces.world_interface import IWorld
-from backend.simulation.clock import Clock
+from backend.simulation.simu_objects.clock import Clock
 
 
 class World(SIMU, IWorld):

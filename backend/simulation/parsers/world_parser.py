@@ -4,10 +4,10 @@ from pydantic import BaseModel
 from typing import List, Optional
 import json
 
-from backend.simulation.world import World
-from backend.simulation.target import Target
-from backend.simulation.target import Cable
-from backend.simulation.target import Dipole
+from backend.simulation.simu_objects.world import World
+from backend.simulation.simu_objects.target import Target
+from backend.simulation.simu_objects.target import Cable
+from backend.simulation.simu_objects.target import Dipole
 
 from backend.utilities.utilities_importer import LLD_to_Coo
 

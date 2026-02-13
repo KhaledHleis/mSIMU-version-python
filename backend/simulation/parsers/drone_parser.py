@@ -3,8 +3,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 import json
 
-from backend.simulation.drone import Drone
-from backend.simulation.sensor import Fluxgate
+from backend.simulation.simu_objects.drone import Drone
+from backend.simulation.simu_objects.sensor import Fluxgate
 from backend.simulation.Interfaces.drone_interface import IDrone
 from backend.simulation.Interfaces.sensor_interface import ISensor
 

@@ -5,7 +5,7 @@ from backend.metaclasses.simu_class import SIMU
 
 from backend.simulation.Interfaces.drone_interface import IDrone
 from backend.simulation.Interfaces.world_interface import IWorld
-from backend.simulation.clock import Clock
+from backend.simulation.simu_objects.clock import Clock
 
 from backend.simulation.parsers.trajectory_parser import TrajectoryParser
 from backend.simulation.parsers.world_parser import WorldParser

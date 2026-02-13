@@ -1,12 +1,12 @@
 from typing import List
 import numpy as np
 from backend.metaclasses.simu_class import SIMU
-from backend.simulation.world import World
+from backend.simulation.simu_objects.world import World
 
 from backend.simulation.Interfaces.sensor_interface import ISensor
 from backend.simulation.Interfaces.drone_interface import IDrone
 from backend.simulation.Interfaces.world_interface import IWorld
-from backend.simulation.clock import Clock
+from backend.simulation.simu_objects.clock import Clock
 
 
 class Drone(SIMU, IDrone):

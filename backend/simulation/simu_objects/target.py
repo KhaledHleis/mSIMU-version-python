@@ -48,7 +48,7 @@ class Dipole(Target):
         
         import numpy as np
 
-from backend.simulation.target import Target
+from backend.simulation.simu_objects.target import Target
 
 class Cable(Target):
 

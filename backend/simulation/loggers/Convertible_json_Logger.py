@@ -5,6 +5,7 @@ import time
 from typing import Any
 from datetime import datetime
 import os
+import copy
 
 class LoggerThread:
     """
@@ -38,19 +39,23 @@ class LoggerThread:
             obj: Object with to_json() method (StringConvertible)
             filename: Optional custom filename (default: auto-generated with timestamp)
         """
-        self.queue.put((obj, filename))
+        self._wait_if_queue_full()
+        # Create a deep snapshot of the data at this moment
+        obj_snapshot = copy.deepcopy(obj.to_dict())
+        self.queue.put((obj_snapshot, filename))
     
     def _worker(self) -> None:
         """Worker thread that processes the queue."""
         while self.running:
             try:
                 # Wait for items with timeout to allow checking self.running
-                obj, filename = self.queue.get(timeout=1)
+                obj_data, filename = self.queue.get(timeout=1)
                 
                 # Generate filename if not provided
                 if filename is None:
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-                    class_name = obj.__class__.__name__
+                    # Extract class name from dict if available, otherwise use generic name
+                    class_name = obj_data.get('name', 'object') if isinstance(obj_data, dict) else 'object'
                     filename = f"{class_name}_{timestamp}.json"
                 
                 # Full path
@@ -58,7 +63,8 @@ class LoggerThread:
                 
                 # Save to file
                 try:
-                    obj.save_json(filepath)
+                    with open(filepath, 'w') as f:
+                        json.dump(obj_data, f, indent=2)
                     print(f"[Logger] Saved {filepath}")
                 except Exception as e:
                     print(f"[Logger] Error saving {filepath}: {e}")
@@ -84,6 +90,16 @@ class LoggerThread:
         """Return the number of items waiting to be logged."""
         return self.queue.qsize()
 
+    def _wait_if_queue_full(self) -> None:
+        """
+        Block if queue has batch_size or more elements.
+        Waits until queue is empty before returning.
+        """
+        if self.queue.qsize() >= self.batch_size:
+            print(f"[Logger] Queue full ({self.queue.qsize()} items), waiting for queue to empty...")
+            self.queue.join()
+            print("[Logger] Queue emptied, resuming...")
+
 
 class BatchLoggerThread(LoggerThread):
     """
@@ -103,6 +119,19 @@ class BatchLoggerThread(LoggerThread):
         self.last_flush = time.time()
         super().__init__(log_dir, batch_size)
     
+    def log(self, obj: Any, filename: str = None) -> None:
+        """
+        Queue an object for logging.
+        
+        Args:
+            obj: Object with to_json() method (StringConvertible)
+            filename: Optional custom filename (ignored in batch mode)
+        """
+        self._wait_if_queue_full()
+        # Create a deep snapshot of the data at this moment
+        obj_snapshot = copy.deepcopy(obj.to_dict())
+        self.queue.put((obj_snapshot, filename))
+    
     def _worker(self) -> None:
         """Worker thread that batches and processes the queue."""
         while self.running:
@@ -113,8 +142,8 @@ class BatchLoggerThread(LoggerThread):
                 
                 # Try to get an item
                 try:
-                    obj, filename = self.queue.get(timeout=0.5)                    
-                    self.batch.append(obj.to_dict())
+                    obj_data, filename = self.queue.get(timeout=0.5)
+                    self.batch.append(obj_data)
                     self.queue.task_done()
                     
                     # Flush if batch is full
@@ -125,7 +154,6 @@ class BatchLoggerThread(LoggerThread):
                     continue
                     
             except Exception as e:
-                print("logger >>>>>",obj)
                 print(f"[BatchLogger] Worker error: {e}")
         
         # Flush remaining items on shutdown

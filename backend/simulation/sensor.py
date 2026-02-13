@@ -32,20 +32,20 @@ class Sensor(SIMU, ISensor):
 class Fluxgate(Sensor):
 
     def make_measurement(self, parent_drone):
-        world = self.parent_drone.world
+        world = parent_drone.world
 
         # Get field in NED frame at sensor position
         field_ned = world.calculate_entire_field_at_position(
             Absolute_position(
-                parent_drone.current_position,
-                parent_drone.current_heading,
-                self.relative_position,
+                parent_drone.current_position.reshape(-1),
+                parent_drone.current_heading.reshape(-1),
+                self.relative_position.reshape(-1),
             )
         )
 
         # Convert from NED to body frame using drone's attitude
         field_body = convert_field_ned_to_body(
-            field_ned, 0, 0, self.parent_drone.current_heading  # yaw
+            field_ned, 0, 0, parent_drone.current_heading  # yaw
         )
-        self.magnetic_field
+        self.magnetic_field = field_body
         return field_body

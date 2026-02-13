@@ -62,10 +62,11 @@ class Experiment(SIMU):
         #! initiate loggers
         if(not self.skip_logging):
             drone_logger, world_logger, self.name = initialize_loggers_batch_with_timestamp(
-                self.name, batch_size=10000,flush_frequency=0.1
+                self.name, batch_size=10000,flush_frequency=0.001
             )
         #! program loop over all trajectory points
         if(not self.skip_logging): world_logger.log(self.world)
+        print("experiment >>>>> number of trajectory points ", len(longitude_array))
         for longitude, latitude, heading in zip(
             longitude_array, latitude_array, heading_array
         ):
@@ -74,6 +75,8 @@ class Experiment(SIMU):
             clock.increment_time()
             if(not self.skip_logging):
                 drone_logger.log(self.drone)
+        print("experiment >>>>> experiment ended saving in progress ...")
+        drone_logger.wait_until_complete()
 
     def __init__(self, name):
         self.name = name

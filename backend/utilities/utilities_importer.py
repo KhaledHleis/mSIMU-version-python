@@ -44,3 +44,17 @@ def LLD_to_Coo(input: np.ndarray, ref: np.ndarray) -> np.ndarray:
     local_coords = np.stack([y_enu, x_enu, z_down], axis=1)
 
     return local_coords
+
+def load_all_objects(directory):
+    import json
+    from pathlib import Path
+
+    """Load all objects from all JSON files into a single list"""
+    all_objects = []
+    
+    for json_file in Path(directory).glob('*.json'):
+        with open(json_file, 'r') as f:
+            objects = json.load(f)
+            all_objects.extend(objects)  # Add all objects from this file
+    
+    return all_objects

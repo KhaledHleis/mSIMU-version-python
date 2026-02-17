@@ -22,8 +22,6 @@ class Target(SIMU,ITarget):
 
 import numpy as np
 
-from backend.simulation.target import Target
-
 class Dipole(Target):
     
     def calculate_field_at_position(self, position) -> np.ndarray:

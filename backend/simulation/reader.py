@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 from backend.utilities.utilities_json_reader import *
-
+from backend.utilities.utilities_exporter import COO_to_LLD
 
 class Reader:
 
@@ -34,8 +34,10 @@ class Reader:
         df = pd.DataFrame()
 
         df["timestamp"] = time_stamp
-        df["longitude"] = position_array[:, 0]
-        df["latitude"] = position_array[:, 1]
+        #convert NE to LLD
+        LLD = COO_to_LLD(position_array,np.array(self.json_object[0]["world"]["reference_point"]))
+        df["longitude"] =  LLD[:, 0]
+        df["latitude"] = LLD[:, 1]
         df["ve"] = np.zeros_like(time_stamp)
         df["vn"] = np.zeros_like(time_stamp)
         df["vd"] = np.zeros_like(time_stamp)

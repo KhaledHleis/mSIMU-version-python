@@ -43,8 +43,8 @@ class Reader:
         df["vd"] = np.zeros_like(time_stamp)
         df["heading"] = heading_array
         df["magx"] = magnetic_field[:, 0]
-        df["magy"] = magnetic_field[:, 0]
-        df["magz"] = magnetic_field[:, 0]
+        df["magy"] = magnetic_field[:, 1]
+        df["magz"] = magnetic_field[:, 2]
         df["mag"] = np.linalg.norm(magnetic_field, axis=-1)
 
         df.to_csv(os.path.join(self.directory_base, "manip.csv"), index=False)

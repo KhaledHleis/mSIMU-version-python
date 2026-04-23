@@ -16,12 +16,6 @@ class Drone(SIMU, IDrone):
     current_position: np.ndarray
     current_heading: np.ndarray
     clock: Clock
-    
-    # Hack: this is a place holder function, you should change it later ...
-    def get_current_data(self):
-        for sensor in self.sensor_array:
-            c = sensor.make_measurement(self)
-        return c
 
     def update_current_data(self):
         for sensor in self.sensor_array:

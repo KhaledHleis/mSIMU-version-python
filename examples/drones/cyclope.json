@@ -1,0 +1,6 @@
+{
+  "name": "drone_cyclope",
+  "sensors": [
+    { "name": "sensor_UNO", "relative_position": [0, 0, 0], "type": "Fluxgate" }
+  ]
+}

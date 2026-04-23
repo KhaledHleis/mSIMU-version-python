@@ -1,0 +1,8 @@
+{
+    "experiment_name":"bb_S90",
+    "world_name":"examples/worlds/world_Cable_sud.json",
+    "drone_name":"examples/drones/cyclope.json",
+    "skip_logging":false,
+    "trajectory_type":"pp",
+    "pp_trajectory_filename":"examples/trajectories/waypoints_90deg.csv"
+}

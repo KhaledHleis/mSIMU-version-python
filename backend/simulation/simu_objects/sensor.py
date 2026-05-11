@@ -6,14 +6,12 @@ from abc import abstractmethod
 from backend.metaclasses.simu_class import SIMU
 
 # ? utilities
-from backend.utilities.utilities_converter import (
-    Absolute_position,
-    convert_field_ned_to_body,
-)
+from backend.utilities.utilities_converter import *
 
 # ? interfaces
 from backend.simulation.Interfaces.sensor_interface import ISensor
 from backend.simulation.Interfaces.drone_interface import IDrone
+
 
 
 class Sensor(SIMU, ISensor):
@@ -21,7 +19,7 @@ class Sensor(SIMU, ISensor):
     relative_position: np.ndarray
 
     @abstractmethod
-    def make_measurement(self):
+    def make_measurement(self, parent_drone: IDrone)-> np.ndarray:
         pass
 
     def __init__(self, name, relative_position: np.ndarray):
@@ -36,16 +34,49 @@ class Fluxgate(Sensor):
 
         # Get field in NED frame at sensor position
         field_ned = world.calculate_entire_field_at_position(
-            Absolute_position(
-                parent_drone.current_position.reshape(-1),
-                parent_drone.current_heading.reshape(-1),
-                self.relative_position.reshape(-1),
+            body_to_ned(
+                parent_drone.current_position.flatten(),
+                parent_drone.current_rotation[0, 0],    # roll
+                parent_drone.current_rotation[0, 1],    # pitch
+                parent_drone.current_rotation[0, 2],     # yaw
+                self.relative_position.flatten(),
             )
         )
 
         # Convert from NED to body frame using drone's attitude
-        field_body = convert_field_ned_to_body(
-            field_ned, 0, 0, parent_drone.current_heading  # yaw
+        field_body = ned_to_body(
+            field_ned.flatten(), 
+            parent_drone.current_rotation[0, 0],    # roll
+            parent_drone.current_rotation[0, 1],    # pitch
+            parent_drone.current_rotation[0, 2]     # yaw
         )
-        self.magnetic_field = field_body
+        # print(">>> field measurement : ", field_body)
+        self.measurement = field_body
         return field_body
+
+class Scalar(Sensor):
+
+    def make_measurement(self, parent_drone):
+        world = parent_drone.world
+
+        # Get field in NED frame at sensor position
+        field_ned = world.calculate_entire_field_at_position(
+            body_to_ned(
+                parent_drone.current_position.flatten(),
+                parent_drone.current_rotation[0, 0],    # roll
+                parent_drone.current_rotation[0, 1],    # pitch
+                parent_drone.current_rotation[0, 2],     # yaw
+                self.relative_position.flatten(),
+            )
+        )
+
+        # Convert from NED to body frame using drone's attitude
+        field_body = ned_to_body(
+            field_ned.flatten(), 
+            parent_drone.current_rotation[0, 0],    # roll
+            parent_drone.current_rotation[0, 1],    # pitch
+            parent_drone.current_rotation[0, 2]     # yaw
+        )
+        self.measurement = np.linalg.norm(field_body)
+        return self.measurement
+

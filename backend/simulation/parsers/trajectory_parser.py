@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from backend.utilities.utilities_importer import *
+from backend.utilities.utilities_converter import lld_to_ned_batch
+
 
 class TrajectoryParser:
 
@@ -42,7 +43,7 @@ class TrajectoryParser:
 
         if(ref is not None):
             coordinates = np.array([longitude, latitude, np.zeros_like(longitude)]).T  # Transpose!
-            coordinates = LLD_to_Coo(coordinates, ref)
+            coordinates = lld_to_ned_batch(coordinates, ref)
             longitude = coordinates[:,0]
             latitude = coordinates[:,1]
         

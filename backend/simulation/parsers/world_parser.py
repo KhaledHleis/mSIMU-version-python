@@ -8,8 +8,7 @@ from backend.simulation.simu_objects.world import World
 from backend.simulation.simu_objects.target import Target
 from backend.simulation.simu_objects.target import Cable
 from backend.simulation.simu_objects.target import Dipole
-
-from backend.utilities.utilities_importer import LLD_to_Coo
+from backend.utilities.utilities_converter import lld_to_ned_batch
 
 
 class WorldParser:
@@ -35,9 +34,9 @@ class WorldParser:
             end = np.array(
                 [cable.ending_longitude, cable.ending_latitude, cable.ending_depth]
             ).reshape(1, 3)
-            start = LLD_to_Coo(start, reference_point)
-            end = LLD_to_Coo(end, reference_point)
-            c = Cable(cable.name, start, end, cable.current)
+            start = lld_to_ned_batch(start, reference_point)
+            end = lld_to_ned_batch(end, reference_point)
+            c = Cable(cable.name, start, end, cable.current,0) # WORK: change the 0 and pass the current frequency in Hz
             target_array.append(c)
         for dipole in fake_class.dipoles:
             center_point = np.array(
@@ -47,14 +46,17 @@ class WorldParser:
                     dipole.center_depth,
                 ]
             ).reshape(1, 3)
-            center_point = LLD_to_Coo(center_point, reference_point)
+            center_point = lld_to_ned_batch(center_point, reference_point)
             d = Dipole(dipole.name, center_point, dipole.dipole_moment)
             target_array.append(d)
 
-        world = World(fake_class.name, target_array)
-        world.reference_point = reference_point
-        world.simulation_radius = fake_class.simulation_radius
-        world.regional_magnetic_field = np.array(fake_class.regional_magnetic_field)
+        world = World(
+            fake_class.name,
+            target_array,
+            simulation_radius=fake_class.simulation_radius,
+            regional_magnetic_field=np.array(fake_class.regional_magnetic_field),
+            reference_point=reference_point,
+        )
         return world
 
     @classmethod

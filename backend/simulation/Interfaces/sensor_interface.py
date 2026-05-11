@@ -6,7 +6,7 @@ class ISensor():
     magnetic_field:np.ndarray
     
     @abstractmethod
-    def make_measurement(self):
+    def make_measurement(self,parent_drone) -> np.ndarray:
         pass
     
     def __init__(self):

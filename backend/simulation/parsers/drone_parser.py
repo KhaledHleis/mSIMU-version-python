@@ -16,10 +16,6 @@ class DroneParser:
         Fill from fake, this method uses the fake class that is automatically
         populated using pydantic to fill the actual class.
         """
-        # Create the drone instance
-        drone = Drone(fake_drone.name)
-        drone.world = world
-
         # Initialize sensor array
         sensor_array: List[ISensor] = []
 
@@ -37,11 +33,11 @@ class DroneParser:
 
             sensor_array.append(sensor)
 
-        drone.sensor_array = sensor_array
+        drone = Drone(fake_drone.name, sensor_array=sensor_array, world=world)
 
         # Initialize position and heading (can be set later via update_position)
         drone.current_position = np.array([[0, 0, 0]])
-        drone.current_heading = 0
+        drone.current_rotation = np.array([[0, 0, 0]])
 
         return drone
 

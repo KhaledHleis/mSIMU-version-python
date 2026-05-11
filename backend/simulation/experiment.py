@@ -70,7 +70,7 @@ class Experiment(SIMU):
         for longitude, latitude, heading in zip(
             longitude_array, latitude_array, heading_array
         ):
-            self.drone.update_position(longitude, latitude, heading)
+            self.drone.update_position(longitude, latitude, np.array([[0, 0, heading]]))
             self.drone.update_current_data()
             clock.increment_time()
             if(not self.skip_logging):

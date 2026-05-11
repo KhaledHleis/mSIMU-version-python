@@ -4,6 +4,7 @@ import numpy as np
 from backend.metaclasses.simu_class import SIMU
 
 from backend.simulation.Interfaces.target_interface import ITarget
+
 class Target(SIMU,ITarget):
     
     @abstractmethod
@@ -16,11 +17,10 @@ class Target(SIMU,ITarget):
             position (np.ndarray): absolute sensor position
 
         Returns:
-            np.ndarray: magnetic field vector or shape (1,3)
+            np.ndarray: magnetic field vector or shape (1,3) in [nT] at the given position
         """
         pass
-
-import numpy as np
+    
 
 class Dipole(Target):
     
@@ -46,7 +46,6 @@ class Dipole(Target):
         
         import numpy as np
 
-from backend.simulation.simu_objects.target import Target
 
 class Cable(Target):
 
@@ -55,7 +54,8 @@ class Cable(Target):
         name: str,
         start_point: np.ndarray,
         end_point: np.ndarray,
-        current: float
+        current: float,
+        current_freq: float # WORK implement frequency
     ):
         self.name = name
         self.start_point = np.asarray(start_point, dtype=float)
@@ -63,6 +63,7 @@ class Cable(Target):
         self.current = current
 
     def calculate_field_at_position(self, position) -> np.ndarray:
+        
         position = np.asarray(position, dtype=float)
 
         R1 = position - self.start_point

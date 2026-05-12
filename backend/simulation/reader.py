@@ -77,7 +77,7 @@ class Reader:
             df[f"magz{suffix}"] = mag_field[:, 2]
             df[f"mag{suffix}"]  = np.linalg.norm(mag_field, axis=-1)
 
-        df.to_csv(os.path.join(self.directory_base, "manip.csv"), index=False)
+        df.to_csv(os.path.join(self.directory_base, f"manip{'_gradio' if gradiometer else ''}.csv"), index=False)
 
     def __init__(self, filename):
         self.directory_base = filename

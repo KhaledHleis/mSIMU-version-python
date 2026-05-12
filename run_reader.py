@@ -4,9 +4,9 @@ from backend.simulation.reader import Reader
 
 from backend.utilities.utilities_json_reader import *
 
-def main(filename, gradiometer=False):
+def main(filename, gradiometer=False, sensor_names=[None]):
     reader = Reader(filename=filename)
-    reader.save_to_csv(gradiometer=gradiometer)
+    reader.save_to_csv(sensor_name=sensor_names, gradiometer=gradiometer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert JSON log files to CSV')
@@ -14,5 +14,6 @@ if __name__ == "__main__":
     parser.add_argument('--gradiometer', '-g', action='store_true', help='Indicates if the sensors are in gradiometer configuration (requires exactly 2 sensor names)')
     parser.add_argument('--sensor_names', '-s', nargs='+', help='List of sensor names to extract data for (default: all sensors)')
     args = parser.parse_args()
+    print(f"Converting {args.filename} to CSV with gradiometer={args.gradiometer} and sensor_names={args.sensor_names}")
     
-    main(args.filename, gradiometer=args.gradiometer)
+    main(args.filename, gradiometer=args.gradiometer, sensor_names=args.sensor_names)

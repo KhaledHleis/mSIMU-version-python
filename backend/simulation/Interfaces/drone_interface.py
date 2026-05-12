@@ -13,7 +13,7 @@ class IDrone():
     
     def update_current_data(self):
         pass
-    def update_position(self,long,lat,rotation,depth = None):
+    def update_position(self,long,lat,rotation:np.ndarray,depth = None):
         pass
     def __init__(self):
         pass

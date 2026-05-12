@@ -8,7 +8,7 @@ def main(config_path):
     exp_parser = ExperimentParser()
     experiment = exp_parser.Parse(config_path)
     experiment.run()
-    print(experiment)
+    print("experiment >>>>> experiment completed successfully")
 
 
 if __name__ == "__main__":

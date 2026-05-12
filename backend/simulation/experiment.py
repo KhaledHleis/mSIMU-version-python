@@ -52,31 +52,41 @@ class Experiment(SIMU):
                 trajectory_file=self.pp_trajectory_filename,
                 drone_file=self.drone_name,
             )
+        else:
+            raise NotImplementedError(
+                f"Trajectory type '{self.trajectory_type}' is not implemented."
+            )
         #! activate the clock
         clock = Clock()
         clock.set_conversion_factor(delta_timestamp)
         #! set drone in place
         self.drone.update_position(
-            longitude_array[0], latitude_array[0], heading_array[0], depth=0
+            longitude_array[0], latitude_array[0], np.array([[0, 0, heading_array[0]]]), depth=0
         )
         #! initiate loggers
         if(not self.skip_logging):
             drone_logger, world_logger, self.name = initialize_loggers_batch_with_timestamp(
-                self.name, batch_size=10000,flush_frequency=0.001
+                self.name, batch_size=10000,flush_frequency=0.001 #! flush every 15 minutes of realtime
             )
-        #! program loop over all trajectory points
-        if(not self.skip_logging): world_logger.log(self.world)
+            #! program loop over all trajectory points
+            world_logger.log(self.world)
+        
         print("experiment >>>>> number of trajectory points ", len(longitude_array))
+        counter = 0
         for longitude, latitude, heading in zip(
             longitude_array, latitude_array, heading_array
         ):
             self.drone.update_position(longitude, latitude, np.array([[0, 0, heading]]))
             self.drone.update_current_data()
             clock.increment_time()
+            if(counter%1000==0):
+                print("experiment >>>>> trajectory point ", counter, " / ", len(longitude_array))
+            counter+=1
             if(not self.skip_logging):
                 drone_logger.log(self.drone)
         print("experiment >>>>> experiment ended saving in progress ...")
-        drone_logger.wait_until_complete()
+        if(not self.skip_logging):
+            drone_logger.wait_until_complete()
 
     def __init__(self, name):
         self.name = name

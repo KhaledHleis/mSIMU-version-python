@@ -1,0 +1,5 @@
+# mSIMU Gradio UI – additional requirements
+# (the simulation's own deps – numpy, pydantic, pyproj – are assumed already installed)
+gradio>=4.31.0
+matplotlib>=3.7.0
+pandas>=2.0.0

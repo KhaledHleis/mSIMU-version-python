@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 from backend.utilities.utilities_json_reader import *
-from backend.utilities.utilities_exporter import COO_to_LLD
+from backend.utilities.utilities_exporter import ned_to_lld
 
 class Reader:
 
@@ -44,7 +44,7 @@ class Reader:
         df["timestamp"] = time_stamp
 
         # Convert NE to LLD
-        LLD = COO_to_LLD(
+        LLD = ned_to_lld(
             position_array,
             np.array(self.json_object[0]["world"]["reference_point"])
         )

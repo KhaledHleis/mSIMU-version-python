@@ -22,7 +22,7 @@ class Experiment(SIMU):
     trajectory_type: str
     world: IWorld
     drone: IDrone
-    skip_logging:bool
+    skip_logging: bool
     # Optional parameters for different trajectory types
     pp_trajectory_filename: Optional[str] = None
 
@@ -34,7 +34,7 @@ class Experiment(SIMU):
         drone = DroneParser.Parse(drone_file, world)
         #! get trajectory
         delta_timestamp, longitude, latitude, heading = TrajectoryParser.read_pbp(
-            trajectory_file, ref=world.reference_point
+            trajectory_file
         )
         return delta_timestamp, longitude, latitude, heading, world, drone
 
@@ -61,16 +61,23 @@ class Experiment(SIMU):
         clock.set_conversion_factor(delta_timestamp)
         #! set drone in place
         self.drone.update_position(
-            longitude_array[0], latitude_array[0], np.array([[0, 0, heading_array[0]]]), depth=0
+            longitude_array[0],
+            latitude_array[0],
+            np.array([[0, 0, heading_array[0]]]),
+            depth=0,
         )
         #! initiate loggers
-        if(not self.skip_logging):
-            drone_logger, world_logger, self.name = initialize_loggers_batch_with_timestamp(
-                self.name, batch_size=10000,flush_frequency=0.001 #! flush every 15 minutes of realtime
+        if not self.skip_logging:
+            drone_logger, world_logger, self.name = (
+                initialize_loggers_batch_with_timestamp(
+                    self.name,
+                    batch_size=10000,
+                    flush_frequency=0.001,  #! flush every 15 minutes of realtime
+                )
             )
             #! program loop over all trajectory points
             world_logger.log(self.world)
-        
+
         print("experiment >>>>> number of trajectory points ", len(longitude_array))
         counter = 0
         for longitude, latitude, heading in zip(
@@ -79,13 +86,18 @@ class Experiment(SIMU):
             self.drone.update_position(longitude, latitude, np.array([[0, 0, heading]]))
             self.drone.update_current_data()
             clock.increment_time()
-            if(counter%1000==0):
-                print("experiment >>>>> trajectory point ", counter, " / ", len(longitude_array))
-            counter+=1
-            if(not self.skip_logging):
+            if counter % 1000 == 0:
+                print(
+                    "experiment >>>>> trajectory point ",
+                    counter,
+                    " / ",
+                    len(longitude_array),
+                )
+            counter += 1
+            if not self.skip_logging:
                 drone_logger.log(self.drone)
         print("experiment >>>>> experiment ended saving in progress ...")
-        if(not self.skip_logging):
+        if not self.skip_logging:
             drone_logger.wait_until_complete()
 
     def __init__(self, name):

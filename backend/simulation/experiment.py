@@ -99,6 +99,7 @@ class Experiment(SIMU):
         print("experiment >>>>> experiment ended saving in progress ...")
         if not self.skip_logging:
             drone_logger.wait_until_complete()
+            drone_logger._flush_batch()
 
     def __init__(self, name):
         self.name = name

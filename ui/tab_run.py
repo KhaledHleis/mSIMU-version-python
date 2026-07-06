@@ -21,10 +21,9 @@ _run_queue: queue.Queue = queue.Queue()
 _proc_ref: list[subprocess.Popen] = []   # single-item "ref" so threads can share it
 
 
-def _stream_proc(proc: subprocess.Popen):
-    """Read stdout+stderr line by line and push to queue."""
-    for line in iter(proc.stdout.readline, b""):
-        _run_queue.put(line.decode("utf-8", errors="replace"))
+def _stream_proc(proc):
+    for line in iter(proc.stdout.readline, ""):
+        _run_queue.put(line)
     proc.wait()
     _run_queue.put(f"\n[Process exited with code {proc.returncode}]\n")
 
@@ -48,6 +47,8 @@ def run_simulation(manip_path: str):
             cwd=str(ROOT),
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
             bufsize=1,
         )
     except Exception as e:

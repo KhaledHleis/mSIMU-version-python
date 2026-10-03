@@ -20,9 +20,20 @@ class Reader:
             get_string_key("current_position", self.json_object)
         ).reshape(-1, 3)
 
-        heading_array = np.array(
+        # current_rotation is logged per sample as [[roll, pitch, yaw]] in
+        # RADIANS (TrajectoryParser.read_pbp converts the waypoint file's
+        # degrees on the way in). Reshape to (N, 3) and take the yaw column,
+        # then convert back to degrees so the exported CSV is in the same
+        # units as the waypoint file it came from.
+        #
+        # NB: flattening and taking [-1] (as this used to) collapses the
+        # whole survey to a single scalar, which makes every consumer think
+        # the INS heading is unusable and silently fall back to GPS
+        # course-over-ground.
+        rotation_array = np.array(
             get_string_key("current_rotation", self.json_object)
-        ).reshape(-1)[-1]
+        ).reshape(-1, 3)
+        heading_array = np.degrees(rotation_array[:, 2])
 
         sensor_array_data = get_string_key("sensor_array", self.json_object)
 
